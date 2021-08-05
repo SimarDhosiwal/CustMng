@@ -1,0 +1,222 @@
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block myblock %}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-6 px-0" style="background: url('/static/img/t1.jpg');background-size: 100% 100%;">
+            <div style="background:rgba(0,0,0,0.5);" class="h-100">
+
+            </div>
+        </div>
+        <div class="col-md-6">
+            <h1>Contact US</h1>
+        
+            <div id="formmsg"></div>
+            <form method="POST" id="queryform" name="queryform" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <label for="">First Name</label>
+                            <input type="text" class="form-control" placeholder="Enter  Name" id="first_name" name="first_name" required>
+
+                        </div>
+                        
+                        <!-- <div class="col-md-6">
+                            
+                        </div> -->
+                      
+                     </div>
+
+                    </div>
+                   
+                   <div>
+                    <div class="form-row h-100">
+                      <div class="col-12 h-100 pb-3">
+                        <textarea class="form-control h-100 pb-3" maxlength = "255" name="querydesc" id="querydesc" placeholder="Issue"
+                          ></textarea>
+                      </div>
+                    </div>
+                   </div>
+                   <div class="form-group">
+                    <label for="">Gender</label>
+                    <select name="gendertype" id="gendertype">
+                        <option value="M" class="form-control">Male</option>
+                        <option value="F">Female</option>
+                        <option value="O">Other</option>
+
+
+                   </div>
+
+                     <div class="form-group">
+                      <label class="form-label">Image</label>
+                      <input type="file" class="form-control" name="issue_img" id="issue_img"
+                        placeholder="Upload Image" required>
+                      <span class="errorm" id="errorfarc"></span>
+                     </div>
+                 
+                 
+                     
+                     <div class="form-group">
+                        <label for="">Add Comment</label>
+                        <input type="text" class="form-control" placeholder="Add Coment" id="add_comm" name="add_comm" >
+  
+  
+                     </div>
+
+               
+                <div class="form-group text-right">
+                    <input type="submit" value="Submit" class="btn btn-success" id="submitbtn">
+
+                </div>
+
+            </form>
+
+            <div class="button-group text- right">
+      
+              <a href="#" class="btn btn-primary" data-toggle="modal" id="reqtoaddbene" data-target="#studatamodal" style="display: none;">Sava Student Data</a>
+              
+            </div>
+        </div>
+
+
+
+        
+    </div>
+
+</div>
+
+<div class="modal fade" id="studatamodal" tabindex="-1" role="dialog" aria-labelledby="studatamodal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title text-center" id="studetails">Student Details</h5>
+  
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span
+              aria-hidden="true">&times;</span> </button>
+  
+        </div>
+        <div class="modal-body">
+          <div id="stumessageS"></div>
+          <div id="stumessageF"></div>
+          <form method="POST" id="studataform">
+            {% csrf_token %}
+  
+  
+            <div class="form-group">
+              <input type="text" class="form-control" placeholder="Enter First Name" name="s_first_name" id='s_first_name'
+                required>
+            </div>
+            <div class="form-group">
+              <input type="text" class="form-control" placeholder="Issue" name="cissue" id='cissue'
+                required>
+            </div>
+            <div class="form-group">
+                <input type="email" class="form-control" placeholder="Enter Email ID" name="s_email_id" id='s_email_id'
+                  required>
+              </div>
+              <div class="form-group">
+                <input type="text" class="form-control" placeholder="Enter DOB" name="s_dob" id='s_dob'
+                  required>
+              </div>
+            <div class="form-group">
+              <input type="text" class="form-control" placeholder="Enter Class" name="s_skill_level"
+                id="s_skill_level"  required>
+            </div>
+            <div class="form-group">
+              <input type="test" class="form-control" placeholder="Enter Instrument" name="s_instrument" id="s_instrument" required>
+            </div>
+            <div class="form-group">
+                <input type="test" class="form-control" placeholder="Student Since" name="s_student_since" id="s_student_since" required>
+              </div>
+         
+         
+            
+
+            <div class="form-group">
+              <button class="custmbtn btn btn-primary btn-block" id="stusubmitbtn" disabled>submit</button>
+  
+            </div>
+  
+           
+          </form>
+        </div>
+    
+      </div>
+    </div>
+  </div>
+
+<script>
+$('#queryform').on('submit', function (event){
+ 
+
+ var token = '{{csrf_token}}';
+ var data = new FormData(this);
+ event.preventDefault();
+ 
+ $.ajax({
+   url: "{% url 'save_data' %}",
+   headers: { "X-CSRFToken": token },
+   method: 'POST',
+   data: data,
+   contentType: false,
+   processData: false,
+   
+   success: function (data) {
+     
+     if (data.status_code == 'S') {
+  
+       $('#formmsg').html("<font color='green'>" + data.status_desc + "</font>"); 
+    //    $("#teacherform")[0].reset()
+
+      
+     }
+     
+     else {
+       
+       $('#formmsg').html("<font color='red'>" + data.status_desc + "</font>" ); 
+       
+       
+     }
+
+   },
+ });
+});
+
+// $('#studataform').on('submit', function (event){
+ 
+//  var token = '{{csrf_token}}';
+//  event.preventDefault();
+//  $.ajax({
+//    url: "{ url 'save_student_data' }",
+//    headers: { "X-CSRFToken": token },
+//    method: 'POST',
+//    data: $(this).serialize(),
+   
+//    success: function (data) {
+     
+//     console.log(data);
+//     if (data.status_code == 'S') {
+  
+//         $('#stumessageS').html("<font color='green'>" + data.status_desc + "</font>"); 
+//         //    $("#teacherform")[0].reset()
+
+//         }
+
+//         else {
+        
+//         $('#stumessageS').html("<font color='red'>" + data.status_desc + "</font>" ); 
+        
+        
+//         }
+
+//    },
+//  });
+// });
+
+
+</script>
+{% endblock %}

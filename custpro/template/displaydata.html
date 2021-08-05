@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% load static %}   
+{% block myblock %} 
+    <div class="container-fluid">
+     
+       
+<!-- new div starts and ends -->
+<div class="row">
+    <div class="col-md-12">
+        <h2 class="text-center">All Data</h2>
+        <a href="{% url 'export_csv' %}" class="btb btn-secondary text">Export CSV </a> 
+
+        <h4 class="text-center">Total:{{ alldetails|length }}</h4>
+        
+        <table class="table table-bordered table-striped table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Query Desc</th>
+                    <th>Gender</th>
+                    <th>Additional Comment</th>
+                    <th>Edit</th>
+          
+          
+                </tr>
+            </thead>
+            <tbody>
+                {% for i in alldetails %}
+                <tr>
+                    <td>{{ i.row_id }}</td>
+                    {% if i.query_description == None %}
+                    <td>{{ '' }}</td>
+                    {% else %}
+                    <td>{{ i.query_description }}</td>
+                    {% endif %}
+                    {% if i.gender == 'F' %}
+                    <td>{{ 'Female' }}</td>
+                    {% elif i.gender == 'M' %}
+                    <td>{{ 'Male' }}</td>
+                    {% elif i.gender == 'O' %}
+                    <td>{{ 'Other' }}</td>
+                    {% else %}
+                    <td>{{ '' }}</td>
+                    {% endif %}
+                    {% if i.additional_ref1 == None %}
+                    <td>{{ '' }}</td>
+                    {% else %}
+                    <td>{{ i.additional_ref1 }}</td>
+                    {% endif %}
+                    <td>
+                    <button class="btn btn-primary" id="refundbtn" name="sifscneft" onclick="showupdatemodal('{{ i.row_id }}')">Edit</button>
+                    </td>             
+                </tr>
+                
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div> 
+
+    </div>
+
+
+    <div class="modal fade" id="update_model" tabindex="-1" role="dialog" aria-labelledby="update_model" aria-hidden="true">
+
+        <div class="modal-dialog   modal-dialog-centered modal-dialog-scrollable" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title text-center" id="update_Title">Update Details</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="l_close_modal"> <span
+                  aria-hidden="true">&times;</span> </button>
+            </div>
+            
+      
+            <div class="modal-body">
+              <div class="row justify-content-md-center mt-4">
+                <div class="col-md-11">
+                  <div id="updatemsg"></div>
+                  <form method="POST" id='u_comment_form'>
+                    {% csrf_token %}
+                    <div class="form-group">
+                      <input type="hidden" id="r_row_id" name="r_row_id" value="">
+                    </div>          
+         
+                    <div class="form-row h-100">
+                      <div class="col-12 h-100 pb-3">
+                        <textarea class="form-control h-100 pb-3" maxlength = "255" name="new_comment" id="new_comment" placeholder="Issue"
+                          ></textarea>
+                      </div>
+                    </div>            
+                    
+                    <div class="form-group">
+                      <button type="submit" id="submit_btn" class="custmbtn btn btn-primary btn-block">Submit</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  
+  </div>
+ 
+      <script>
+        function showupdatemodal(ROW_ID){       
+         
+            $('#r_row_id').val(ROW_ID);
+            $('#update_model').modal('show');
+
+          }
+
+$('#u_comment_form').on('submit', function (event){
+ 
+
+ var token = '{{csrf_token}}';
+ event.preventDefault();
+ 
+ $.ajax({
+  url: "{% url 'update_details' %}",
+  headers: { "X-CSRFToken": token },
+  method: 'POST',
+  data: $(this).serialize(),
+   
+   success: function (data) {
+     
+     if (data.status_code == 'S') {
+  
+       $('#updatemsg').html("<font color='green'>" + data.status_desc + "</font>"); 
+        setTimeout(function(){
+          $('#update_model').modal('hide')
+        }, 4000);
+
+      
+     }
+     
+     else {
+       
+       $('#updatemsg').html("<font color='red'>" + data.status_desc + "</font>" ); 
+       
+       
+     }
+
+   },
+ });
+});
+
+      </script>
+    {% endblock %}
+
